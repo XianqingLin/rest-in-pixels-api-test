@@ -1,0 +1,33 @@
+name: Test SiliconFlow Domestic & Global
+
+on:
+  workflow_dispatch:          # 手动触发
+  push:
+    branches: [ main ]
+
+jobs:
+  overseas-test:
+    runs-on: ubuntu-latest     # 海外 runner
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run test script
+        env:
+          API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+        run: python test_sf.py
+
+      - name: Upload log as artifact
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-log
+          path: test.log          # 脚本里把输出重定向到文件即可
